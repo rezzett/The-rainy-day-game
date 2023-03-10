@@ -8,8 +8,11 @@
 #include "Gui.h"
 
 class Game {
+	// TODO water layer
+	// TODO sounds manager
 	std::shared_ptr<sf::RenderWindow> win;
 	AssetManager assetManager;
+	sf::RectangleShape water;
 	Gui gui;
 	Bucket bucket;
 	sf::Sprite bg;
@@ -42,6 +45,11 @@ public:
 		bg.setScale(4.0, 4.0);
 		gui.setup(*win);
 
+		water.setFillColor(sf::Color(0, 150, 255, 128));
+		water.setSize(sf::Vector2f(win->getSize().x, 100));
+		water.setPosition(0, win->getSize().y);
+
+
 		bucket.setTexture(assetManager.getTexture("assets/bucket.png"));
 		bucket.setPosition(
 			win->getSize().x / 2.0 - bucket.getGlobalBounds().width / 2,
@@ -68,9 +76,8 @@ public:
 			if (drops[i].getGlobalBounds().top > win->getSize().y) {
 				drops.erase(drops.begin() + i);
 				deep++;
-				std::cout << "Fail. Deep:" << deep << std::endl;
-				if (deep > 5) {
-					std::cout << "Game Over!" << std::endl;
+				water.setPosition(0, win->getSize().y - deep);
+				if (deep > bucket.getGlobalBounds().height - 10) {
 					isGameOver = true;
 				}
 			}
@@ -83,6 +90,7 @@ public:
 		gui.render(*win, isGameOver);
 		for (int i = 0; i < drops.size(); ++i) drops[i].render(*win);
 		bucket.render(*win);
+		win->draw(water);
 		win->display();
 	}
 
