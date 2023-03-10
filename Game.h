@@ -7,6 +7,8 @@
 #include "GameObj.h"
 #include "Gui.h"
 
+#define DROP_SPAWN_DELAY 10
+
 class Game {
 	// TODO water layer
 	// TODO sounds manager
@@ -17,12 +19,13 @@ class Game {
 	Bucket bucket;
 	sf::Sprite bg;
 	std::vector<Drop> drops;
-	float dropSpawnDelay{ 800 };
+	float dropSpawnDelay{ DROP_SPAWN_DELAY };
 	float dropTimer{ 0 };
 	int dropLimit{ 5 };
 	int score{ 0 };
 	int deep{ 0 };
 	bool isGameOver{ false };
+	bool exit{ false };
 
 	void spawnDrop()
 	{
@@ -36,11 +39,24 @@ class Game {
 			}
 		}
 	}
+
+	void resume() {
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Y)) {
+			score = 0;
+			water.setPosition(0, win->getSize().y);
+			isGameOver = false;
+			deep = 0;
+			dropSpawnDelay = DROP_SPAWN_DELAY;
+		}
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::N)) {
+			exit = true;
+		}
+	}
 public:
 	Game(AssetManager&& assets) : assetManager(assets)
 	{
 		win = std::make_shared<sf::RenderWindow>(sf::VideoMode(800, 600), "Rainy Day");
-		win->setFramerateLimit(2000); // TODO
+		win->setFramerateLimit(60); // TODO
 		bg.setTexture(assetManager.getTexture("assets/rainbg.png"));
 		bg.setScale(4.0, 4.0);
 		gui.setup(*win);
@@ -66,7 +82,10 @@ public:
 			if (drops[i].getGlobalBounds().intersects(bucket.getGlobalBounds())) {
 				drops.erase(drops.begin() + i);
 				score++;
-				dropSpawnDelay -= (int)(score / 4); // difficulty
+				if (score > 10) dropSpawnDelay = 9;
+				if (score > 30) dropSpawnDelay = 8;
+				if (score > 50) dropSpawnDelay = 7;
+				if (score > 100) dropSpawnDelay = 6;
 			}
 		}
 
@@ -95,7 +114,7 @@ public:
 	}
 
 	void run() {
-		while (win->isOpen())
+		while (win->isOpen() and !exit)
 		{
 			sf::Event e;
 			while (win->pollEvent(e))
@@ -106,6 +125,10 @@ public:
 			if (!isGameOver) {
 				update();
 			}
+			else {
+				resume();
+			}
+
 			draw();
 		}
 	}

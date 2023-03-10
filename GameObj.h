@@ -2,6 +2,8 @@
 
 #include <SFML/Graphics.hpp>
 
+#define SPEED 8.0 
+
 class GameObj
 {
 protected:
@@ -37,13 +39,13 @@ public:
 	void update(const sf::RenderWindow& win)
 	{
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::A) and sprite.getPosition().x > 0) {
-			sprite.move(-0.1, 0.0);
+			sprite.move(-SPEED, 0.0);
 		}
 
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)
 			and sprite.getPosition().x + sprite.getGlobalBounds().width < win.getSize().x)
 		{
-			sprite.move(0.1, 0.0);
+			sprite.move(SPEED, 0.0);
 		}
 	}
 };
@@ -53,6 +55,6 @@ class Drop final : public GameObj
 public:
 	void update(const sf::RenderWindow& win)
 	{
-		sprite.move(0.0, 0.1);
+		sprite.move(0.0, SPEED);
 	}
 };
