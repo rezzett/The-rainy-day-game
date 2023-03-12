@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <iostream>
+#include <SFML/Audio.hpp>
 
 #include "AssetManager.h"
 #include "GameObj.h"
@@ -19,6 +20,7 @@ class Game {
 	Bucket bucket;
 	sf::Sprite bg;
 	std::vector<Drop> drops;
+	sf::Music rainSound;
 	float dropSpawnDelay{ DROP_SPAWN_DELAY };
 	float dropTimer{ 0 };
 	int dropLimit{ 5 };
@@ -70,6 +72,9 @@ public:
 		bucket.setPosition(
 			win->getSize().x / 2.0 - bucket.getGlobalBounds().width / 2,
 			(win->getSize().y - bucket.getGlobalBounds().height));
+
+		rainSound.openFromFile("assets/rain.ogg");
+		rainSound.setLoop(true);
 	}
 
 	void update() {
@@ -114,6 +119,7 @@ public:
 	}
 
 	void run() {
+		rainSound.play();
 		while (win->isOpen() and !exit)
 		{
 			sf::Event e;
