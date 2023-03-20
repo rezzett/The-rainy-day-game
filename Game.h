@@ -21,6 +21,8 @@ class Game {
 	sf::Sprite bg;
 	std::vector<Drop> drops;
 	sf::Music rainSound;
+	sf::SoundBuffer soundBuffer;
+	sf::Sound dropSound;
 	float dropSpawnDelay{ DROP_SPAWN_DELAY };
 	float dropTimer{ 0 };
 	int dropLimit{ 5 };
@@ -75,6 +77,9 @@ public:
 
 		rainSound.openFromFile("assets/rain.ogg");
 		rainSound.setLoop(true);
+
+		soundBuffer.loadFromFile("assets/drop.ogg");
+		dropSound.setBuffer(soundBuffer);
 	}
 
 	void update() {
@@ -87,6 +92,7 @@ public:
 			if (drops[i].getGlobalBounds().intersects(bucket.getGlobalBounds())) {
 				drops.erase(drops.begin() + i);
 				score++;
+				dropSound.play();
 				if (score > 10) dropSpawnDelay = 9;
 				if (score > 30) dropSpawnDelay = 8;
 				if (score > 50) dropSpawnDelay = 7;
